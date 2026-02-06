@@ -1,0 +1,206 @@
+
+
+@font-face {
+  font-family: "Glitch";
+  src: url("./Glitch-Demo.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "OffBit";
+  src: url("./OffBit-Regular.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "DotBold";
+  src: url("./OffBit-DotBold.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+}
+
+
+
+
+
+/* === BODY === */
+body {
+  margin: 0;
+  padding: 0;
+  background: #000f0f;
+  font-family: sans-serif;
+  overflow: hidden;
+}
+
+
+.vu {
+  position: fixed;
+  top: 10%;
+  left: 5%;
+  display: flex;
+  gap: 1rem; /* espace entre les boutons */
+  font-family: "DotBold", monospace;
+}
+
+.vu nav {
+  display: flex;
+  gap: 1rem;
+  text-align: center;
+}
+
+.vu button {
+  font-size: 7rem; 
+  color: #dbfaff;
+  background: none;
+  border: none;
+  padding: 0;
+  margin-right: 5rem;
+  font-family: "DotBold", monospace;
+  cursor: default;
+  
+  opacity: 0;           /* texte invisible par défaut */
+  transition: opacity 1s ease; /* apparition douce */
+}
+
+
+
+
+canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+
+
+
+
+/*
+.para {
+  position: fixed;
+  top: 20%;
+  left: 5%;
+  display: flex;
+  color: #3b3b3b;
+  font-family: monospace;
+  font-size: 1rem;
+  width: 50%;
+}
+
+
+.para p {
+
+  width: 250px;
+  margin-right: 2.5rem;
+
+}
+*/
+
+
+
+.empty {
+  width: 100%;
+  height: 100%;
+  background: transparent; /* juste vide */
+}
+
+
+
+/* === SCÈNE ET GRILLE === */
+.scene {
+  position: fixed;
+  width: 95vw;
+  height: 100vh;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(50px, 1fr)); /* colonnes adaptatives */
+  grid-auto-rows: 50px; /* toutes les images carrées */
+  gap: 10px;             /* espace entre les images */
+  padding: 10px;          /* petit padding autour de la grille */
+  box-sizing: border-box;
+  margin-left: 0%;
+  margin-top: 25%;
+
+}
+
+
+
+
+/* Cluster n’a plus besoin de position */
+.cluster {
+  display: contents;
+}
+
+/* === PANELS === */
+.panel {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* --- ANIMATION APPARITION PANELS --- */
+.panel {
+  position: relative;
+}
+
+/* image cachée au début */
+.panel img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  opacity: 0;
+  transform: scale(0.96);
+  transition: opacity 0.7s ease, transform 0.7s ease;
+}
+
+/* bordure épaisse et ronde */
+.panel::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 3px solid white; /* bordure épaisse */
+  opacity: 0;
+  transform: rotate(0deg);
+}
+
+/* état "loading" : la bordure tourne UNE FOIS puis reste */
+.panel.is-loading::before {
+  opacity: 1;
+  animation: spinBorderOnce 0.8s linear forwards; /* une seule rotation */
+}
+
+/* état "visible" : image apparaît */
+.panel.is-visible img {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* quand l’image est visible → on enlève la bordure */
+.panel.is-visible::before {
+  opacity: 0;
+}
+
+/* animation rotation unique */
+@keyframes spinBorderOnce {
+  to {
+    transform: rotate(360deg);
+  }
+}
