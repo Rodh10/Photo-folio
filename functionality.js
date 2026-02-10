@@ -151,6 +151,7 @@ function clusterAnimation() {
 
 
 
+
 /*
 
 function makeQuarterCircleRoundedBottomLeft(paraSelector) {
@@ -215,13 +216,97 @@ window.addEventListener('load', () => {
 
 
 
+function splitAmateurText(text) {
+  const p = document.querySelector(".amateur p");
+  if (!p) return null;
+
+  // Remplacer le contenu par le nouveau texte
+  p.innerHTML = "";
+
+  [...text].forEach(char => {
+    const span = document.createElement("span");
+    span.textContent = char === " " ? "\u00A0" : char;
+    span.style.display = "inline-block";
+    span.style.opacity = "0";
+    p.appendChild(span);
+  });
+
+  return p;
+}
+
+// ✅ Apparition aléatoire
+function amateurAppear(text) {
+  const p = splitAmateurText(text);
+  if (!p) return;
+
+  p.style.color = "#dbfaff";
+
+  const spans = [...p.querySelectorAll("span")];
+
+  spans.forEach(span => {
+    const delay = Math.random() * 900;
+
+    setTimeout(() => {
+      span.style.transition = "opacity 0.25s ease";
+      span.style.opacity = "1";
+    }, delay);
+  });
+}
+
+// ✅ Disparition aléatoire
+function amateurDisappear() {
+  const p = document.querySelector(".amateur p");
+  if (!p) return;
+
+  const spans = [...p.querySelectorAll("span")];
+  if (!spans.length) return;
+
+  spans.forEach(span => {
+    const delay = Math.random() * 700;
+
+    setTimeout(() => {
+      span.style.transition = "opacity 0.25s ease";
+      span.style.opacity = "0";
+    }, delay);
+  });
+
+  setTimeout(() => {
+    p.style.color = "transparent";
+  }, 900);
+}
 
 
 
 
 
+function startAmateurLoop() {
+  const texts = [
+    "Life through a smartphone lens.",
+    "Feeling like a déjà-vu",
+    "Logic ends where paradox begins."
+  ];
 
+  let index = 0;
 
+  function loop() {
+    // 1) apparition
+    amateurAppear(texts[index]);
+
+    // 2) attendre un peu, puis disparition
+    setTimeout(() => {
+      amateurDisappear();
+
+      // 3) attendre la fin de disparition, puis changer texte
+      setTimeout(() => {
+        index = (index + 1) % texts.length;
+        loop();
+      }, 1200);
+
+    }, 10000); // durée où le texte reste visible
+  }
+
+  loop();
+}
 
 
 
@@ -239,6 +324,7 @@ function launchAnimations() {
   // Étape 3 : animation du cluster après 500ms
   setTimeout(() => {
     clusterAnimation();
+    startAmateurLoop(); // ✅ démarre la boucle texte
   }, 1500);
 }
 

@@ -15,6 +15,13 @@
 }
 
 @font-face {
+  font-family: "OffDot";
+  src: url("./OffBit-Dot.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
   font-family: "DotBold";
   src: url("./OffBit-DotBold.ttf") format("truetype");
   font-weight: normal;
@@ -62,7 +69,7 @@ body {
 .vu .nav-item {
   display: inline-flex;
   cursor: pointer;
-  margin-right: 4rem;
+  margin-right: 5rem;
   opacity: 0; /* parent invisible par défaut */
 }
 
@@ -129,6 +136,27 @@ body {
 
 }
 */
+
+
+
+
+
+
+
+
+
+.amateur {
+  position: fixed;
+  top: 40%;
+  color: #dbfaff;
+  font-family: "OffDot", monospace;
+  font-size: 1rem;
+  width: 100%;
+  word-spacing: 18rem;
+  text-align: center;
+  letter-spacing: 1px;
+  color: transparent;
+}
 
 
 
@@ -205,6 +233,9 @@ body {
   transform: rotate(0deg);
 }
 
+
+
+
 /* état "loading" : la bordure tourne UNE FOIS puis reste */
 .panel.is-loading::before {
   opacity: 1;
@@ -228,3 +259,5 @@ body {
     transform: rotate(360deg);
   }
 }
+
+
