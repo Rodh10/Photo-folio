@@ -35,13 +35,19 @@ body {
 }
 
 
+
+
+
+
+
+
+
 .vu {
   position: fixed;
-  top: 10%;
+  top: 5%;
   left: 5%;
   display: flex;
-  gap: 1rem; /* espace entre les boutons */
-  font-family: "DotBold", monospace;
+  gap: 1.5rem; /* espace global */
 }
 
 .vu nav {
@@ -50,28 +56,25 @@ body {
   text-align: center;
 }
 
-.vu button {
-  font-size: 7rem; 
-  color: #dbfaff;
-  background: none;
-  border: none;
-  padding: 0;
-  margin-right: 5rem;
-  font-family: "DotBold", monospace;
+/* ancien button => maintenant tes liens ou containers SVG */
+.vu .nav-item {
+  display: inline-flex;
+  margin-right: 5rem; /* garde exactement ton ancien spacing */
   cursor: default;
-  
-  opacity: 0;           /* texte invisible par défaut */
-  transition: opacity 1s ease; /* apparition douce */
+  color: #dbfaff;
+
+
+}
+
+/* le svg injecté */
+.vu .nav-item svg {
+  height: 10rem; /* prend toute la hauteur du container */
+  width: auto;  /* largeur proportionnelle */
+  display: block;
+
 }
 
 
-
-
-canvas {
-  position: absolute;
-  top: 0;
-  left: 0;
-}
 
 
 
@@ -100,6 +103,9 @@ canvas {
 
 
 
+
+
+
 .empty {
   width: 100%;
   height: 100%;
@@ -123,8 +129,6 @@ canvas {
   margin-top: 25%;
 
 }
-
-
 
 
 /* Cluster n’a plus besoin de position */
