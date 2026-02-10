@@ -20,36 +20,74 @@ async function replaceImgByInlineSVG(img) {
   // remplacer <img> par <svg>
   parent.replaceChild(svg, img);
 
-  // ajouter classe "loading"
-  parent.classList.add("svg-loading");
-
-  // tous les éléments du SVG invisibles
   const dots = svg.querySelectorAll("path, circle, rect, polygon");
-  dots.forEach(dot => {
-    dot.style.opacity = 0;
-  });
+  dots.forEach(dot => dot.style.opacity = 0);
 
-  // délai aléatoire avant apparition
+  // vérifier si cette page est active
+  const pageUrl = window.location.pathname.split("/").pop(); // ex: "about.html"
+  const linkUrl = parent.getAttribute("href");
+  const isActive = pageUrl === linkUrl;
+
+  // --- apparition initiale pour tous ---
   const delay = Math.random() * 800;
   setTimeout(() => {
-    // rendre parent et SVG visibles
     parent.classList.add("is-visible");
-    parent.classList.remove("svg-loading");
 
-    // apparition aléatoire des dots
     dots.forEach(dot => {
       const dotDelay = Math.random() * 900;
-      setTimeout(() => {
-        dot.style.opacity = 1;
-      }, dotDelay);
+      setTimeout(() => dot.style.opacity = 1, dotDelay);
     });
+
+    svg.style.opacity = 1;
+
+    // --- après apparition complète ---
+    setTimeout(() => {
+      if (!isActive) {
+        returnToDefault(svg, dots, parent); // lien actif ne revient pas à 0.5
+      }
+      // hover effect uniquement si pas actif
+      if (!isActive) addHoverEffect(svg, parent);
+    }, 3000);
   }, delay);
+}
+
+// retour à 0.5 pour les non-actifs
+function returnToDefault(svg, dots, parent) {
+  svg.style.opacity = 0.5;
+  dots.forEach(dot => {
+    const dotDelay = Math.random() * 500;
+    setTimeout(() => dot.style.opacity = 0.5, dotDelay);
+  });
+}
+
+// hover effect pour les non-actifs
+function addHoverEffect(svg, parent) {
+  const dots = svg.querySelectorAll("path, circle, rect, polygon");
+
+  parent.addEventListener("mouseenter", () => {
+    svg.style.opacity = 1;
+    dots.forEach(dot => {
+      const dotDelay = Math.random() * 300;
+      setTimeout(() => dot.style.opacity = 1, dotDelay);
+    });
+  });
+
+  parent.addEventListener("mouseleave", () => {
+    returnToDefault(svg, dots, parent);
+  });
 }
 
 function bubbleTextAnimation() {
   const imgs = document.querySelectorAll(".vu .nav-item img.nav-svg");
   imgs.forEach(img => replaceImgByInlineSVG(img));
 }
+
+
+
+
+
+
+
 
 
 
@@ -108,9 +146,6 @@ function clusterAnimation() {
     }, borderDelay);
   });
 }
-
-
-
 
 
 
