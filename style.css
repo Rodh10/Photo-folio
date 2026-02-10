@@ -42,37 +42,66 @@ body {
 
 
 
+
+
 .vu {
   position: fixed;
   top: 5%;
   left: 5%;
   display: flex;
-  gap: 1.5rem; /* espace global */
+  gap: 1.5rem;
 }
 
 .vu nav {
   display: flex;
   gap: 1rem;
   text-align: center;
+  height: 6rem;
 }
 
-/* ancien button => maintenant tes liens ou containers SVG */
 .vu .nav-item {
   display: inline-flex;
-  margin-right: 5rem; /* garde exactement ton ancien spacing */
-  cursor: default;
-  color: #dbfaff;
-
-
+  cursor: pointer;
+  margin-right: 4rem;
+  opacity: 0; /* parent invisible par défaut */
 }
 
-/* le svg injecté */
-.vu .nav-item svg {
-  height: 10rem; /* prend toute la hauteur du container */
-  width: auto;  /* largeur proportionnelle */
+/* cacher l'image avant le remplacement */
+.vu .nav-item img.nav-svg {
   display: block;
-
+  width: 100%;
+  height: auto;
+  opacity: 0; /* invisible jusqu'à remplacement */
 }
+
+/* SVG invisibles de base */
+.vu .nav-item svg {
+  width: 100%;
+  height: auto;
+  display: block;
+  opacity: 0;
+}
+
+/* état visible */
+.vu .nav-item.is-visible {
+  opacity: 1;
+}
+
+.vu .nav-item.is-visible svg {
+  opacity: 1;
+}
+
+/* optionnel : état "loading" avant apparition */
+.vu .nav-item.svg-loading {
+  opacity: 0; /* léger fade avant l’animation complète */
+}
+
+
+
+
+
+
+
 
 
 
@@ -100,6 +129,9 @@ body {
 
 }
 */
+
+
+
 
 
 
@@ -144,18 +176,6 @@ body {
   overflow: hidden;
   cursor: pointer;
 }
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 /* --- ANIMATION APPARITION PANELS --- */

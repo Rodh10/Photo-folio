@@ -1,6 +1,3 @@
-
-
-
 async function replaceImgByInlineSVG(img) {
   const src = img.getAttribute("src");
   if (!src) return;
@@ -14,51 +11,44 @@ async function replaceImgByInlineSVG(img) {
   const svg = wrapper.querySelector("svg");
   if (!svg) return;
 
-  // responsive
   svg.removeAttribute("width");
   svg.removeAttribute("height");
-  svg.style.width = "100%";
-  svg.style.height = "auto";
-  svg.style.display = "block";
-
-  // pour que la couleur CSS marche
   svg.style.fill = "currentColor";
 
+  const parent = img.parentElement;
+
   // remplacer <img> par <svg>
-  img.replaceWith(svg);
+  parent.replaceChild(svg, img);
 
-  // animer les dots
-  animateSvgDots(svg);
-}
+  // ajouter classe "loading"
+  parent.classList.add("svg-loading");
 
-
-function animateSvgDots(svg) {
+  // tous les éléments du SVG invisibles
   const dots = svg.querySelectorAll("path, circle, rect, polygon");
-
-  // état initial : invisible
   dots.forEach(dot => {
     dot.style.opacity = 0;
   });
 
-  // apparition aléatoire et indépendante
-  dots.forEach(dot => {
-    const delay = Math.random() * 900; // délai aléatoire
+  // délai aléatoire avant apparition
+  const delay = Math.random() * 800;
+  setTimeout(() => {
+    // rendre parent et SVG visibles
+    parent.classList.add("is-visible");
+    parent.classList.remove("svg-loading");
 
-    setTimeout(() => {
-      // transition uniquement sur opacity
-      dot.style.transition = "opacity 0s"; // brusque, pas de fondu
-      dot.style.opacity = 1;
-    }, delay);
-  });
+    // apparition aléatoire des dots
+    dots.forEach(dot => {
+      const dotDelay = Math.random() * 900;
+      setTimeout(() => {
+        dot.style.opacity = 1;
+      }, dotDelay);
+    });
+  }, delay);
 }
 
-/* ton nom original */
 function bubbleTextAnimation() {
   const imgs = document.querySelectorAll(".vu .nav-item img.nav-svg");
-
-  imgs.forEach(img => {
-    replaceImgByInlineSVG(img);
-  });
+  imgs.forEach(img => replaceImgByInlineSVG(img));
 }
 
 
@@ -118,6 +108,10 @@ function clusterAnimation() {
     }, borderDelay);
   });
 }
+
+
+
+
 
 
 
@@ -210,7 +204,7 @@ function launchAnimations() {
   // Étape 3 : animation du cluster après 500ms
   setTimeout(() => {
     clusterAnimation();
-  }, 800);
+  }, 1500);
 }
 
 
