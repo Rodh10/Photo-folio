@@ -119,11 +119,6 @@ async function inlineLoadingSVG(loader, onFinish) {
 
 
 
-
-
-
-
-
 async function replaceImgByInlineSVG(img) {
   const src = img.getAttribute("src");
   if (!src) return;
@@ -154,7 +149,7 @@ async function replaceImgByInlineSVG(img) {
   const linkUrl = parent.getAttribute("href");
   const isActive = pageUrl === linkUrl;
 
-  // --- apparition initiale pour tous ---
+  // apparition initiale aléatoire
   const delay = Math.random() * 800;
   setTimeout(() => {
     parent.classList.add("is-visible");
@@ -166,13 +161,12 @@ async function replaceImgByInlineSVG(img) {
 
     svg.style.opacity = 1;
 
-    // --- après apparition complète ---
+    // après apparition complète
     setTimeout(() => {
       if (!isActive) {
         returnToDefault(svg, dots, parent); // lien actif ne revient pas à 0.5
       }
-      // hover effect uniquement si pas actif
-      if (!isActive) addHoverEffect(svg, parent);
+      // ✅ plus d'effet hover/click
     }, 3000);
   }, delay);
 }
@@ -186,32 +180,10 @@ function returnToDefault(svg, dots, parent) {
   });
 }
 
-// hover effect pour les non-actifs
-function addHoverEffect(svg, parent) {
-  const dots = svg.querySelectorAll("path, circle, rect, polygon");
-
-  parent.addEventListener("mouseenter", () => {
-    svg.style.opacity = 1;
-    dots.forEach(dot => {
-      const dotDelay = Math.random() * 300;
-      setTimeout(() => dot.style.opacity = 1, dotDelay);
-    });
-  });
-
-  parent.addEventListener("mouseleave", () => {
-    returnToDefault(svg, dots, parent);
-  });
-}
-
 function bubbleTextAnimation() {
   const imgs = document.querySelectorAll(".vu .nav-item img.nav-svg");
   imgs.forEach(img => replaceImgByInlineSVG(img));
 }
-
-
-
-
-
 
 
 
