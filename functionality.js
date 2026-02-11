@@ -1,3 +1,129 @@
+// ===============================
+// Animation cinématique du loading avec apparition/disparition aléatoire
+// ===============================
+function launchLoadingSVGAnimation(svg, loader, onFinish) {
+  const pieces = [...svg.querySelectorAll("path, circle, rect, polygon, line, polyline, ellipse")];
+
+  // état initial
+  pieces.forEach(el => {
+    el.style.opacity = 0;
+    el.style.transition = "opacity 1.2s ease";
+  });
+  svg.style.opacity = 0;
+  svg.style.transition = "opacity 1.4s ease, transform 1.8s ease";
+
+  // fade-in du SVG
+  setTimeout(() => {
+    svg.style.opacity = 1;
+  }, 250);
+
+  // 🔹 apparition aléatoire des pièces
+  pieces.forEach(el => {
+    const randomDelay = 1000 + Math.random() * 3000; // entre 0.5s et 1.5s
+    setTimeout(() => {
+      el.style.opacity = 1;
+    }, randomDelay);
+  });
+
+  // durée approximative pour la pause après apparition
+  const maxAppearDelay = 3000; // correspond au max randomDelay
+  setTimeout(() => {
+  }, maxAppearDelay + 800); // légère pause
+
+  // 🔹 disparition aléatoire des pièces
+  setTimeout(() => {
+    pieces.forEach(el => {
+      const randomDelay = Math.random() * 800; // disparition aléatoire
+      setTimeout(() => {
+        el.style.opacity = 0;
+      }, randomDelay);
+    });
+
+    // disparition du SVG en même temps
+    setTimeout(() => {
+      svg.style.opacity = 0;
+    }, 1000); // après disparition des pièces
+  }, maxAppearDelay + 1800); // après pause logo complet
+
+  // 🔹 disparition complète du loader et callback
+  setTimeout(() => {
+    if (loader) loader.classList.remove("active");
+    document.body.style.overflow = "auto";
+    if (onFinish) onFinish(); // signale que le loader est terminé
+  }, maxAppearDelay + 1800 + 1500); // marge finale pour s'assurer que tout est fini
+}
+
+
+// ===============================
+// Fonction startLoader avec callback
+// ===============================
+function startLoader() {
+  return new Promise((resolve) => {
+    const alreadyPlayed = sessionStorage.getItem("loadingSVGPlayed");
+    const loader = document.querySelector(".load");
+
+    if (!alreadyPlayed) {
+      if (loader) document.body.style.overflow = "hidden";
+
+      inlineLoadingSVG(loader, () => {
+        sessionStorage.setItem("loadingSVGPlayed", "true");
+        resolve(); // 🔹 ici, on sait que le loader est fini
+      });
+
+    } else {
+      if (loader) {
+        loader.classList.remove("active");
+        document.body.style.overflow = "auto";
+      }
+      resolve(); // rien à attendre
+    }
+  });
+}
+
+// ===============================
+// Modification inlineLoadingSVG pour accepter callback
+// ===============================
+async function inlineLoadingSVG(loader, onFinish) {
+  if (!loader) return;
+
+  const img = loader.querySelector("img");
+  if (!img) return;
+
+  const src = img.getAttribute("src");
+  if (!src) return;
+
+  const res = await fetch(src);
+  const svgText = await res.text();
+
+  const wrapper = document.createElement("div");
+  wrapper.innerHTML = svgText;
+
+  const svg = wrapper.querySelector("svg");
+  if (!svg) return;
+
+  svg.removeAttribute("width");
+  svg.removeAttribute("height");
+  svg.style.fill = "currentColor";
+  svg.style.opacity = 0;
+
+  img.replaceWith(svg);
+  loader.classList.add("active");
+
+  // 🔹 on passe le callback à l'animation
+  launchLoadingSVGAnimation(svg, loader, onFinish);
+}
+
+
+
+
+
+
+
+
+
+
+
+
 async function replaceImgByInlineSVG(img) {
   const src = img.getAttribute("src");
   if (!src) return;
@@ -330,14 +456,22 @@ function launchAnimations() {
 
 
 
-// === Lancer après que le DOM et les fonts soient prêts ===
+
+
+
+
+
+
+// ===============================
+// Au chargement de la page
+// ===============================
 window.addEventListener("load", () => {
   document.fonts.ready.then(() => {
-    launchAnimations();
+    startLoader().then(() => {
+      // 🔹 ici, toutes les autres animations ne démarrent qu'après la fin du loader
+      launchAnimations();
+    });
   });
 });
-
-
-
 
 

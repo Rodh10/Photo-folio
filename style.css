@@ -50,6 +50,55 @@ body {
 
 
 
+/* Loader full screen */
+.load {
+  position: fixed;
+  inset: 0; 
+  display: grid;
+  place-items: center; 
+  background-color: #000f0f; 
+  z-index: 9999;
+  opacity: 0; /* 🔹 invisible au départ */
+  pointer-events: none; /* empêche interactions */
+  transition: opacity 1.3s ease; 
+}
+
+/* quand loader actif */
+.load.active {
+  opacity: 1;
+  pointer-events: all;
+}
+
+/* SVG à l'intérieur du loader */
+.load svg {
+  width: min(520px, 70vw);
+  height: auto;
+  opacity: 0; /* 🔹 invisible au départ */
+  fill: currentColor;
+  transition: opacity 1.4s ease, transform 1.8s ease;
+}
+
+/* Animation pièce par pièce */
+.load svg .piece {
+  opacity: 0;
+  transition: opacity 1.2s ease;
+}
+
+/* Optionnel : disparition du loader */
+.load.hidden {
+  opacity: 0;
+  pointer-events: none; 
+}
+
+
+
+
+
+
+
+
+
+
 
 .vu {
   position: fixed;
