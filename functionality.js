@@ -119,6 +119,11 @@ async function inlineLoadingSVG(loader, onFinish) {
 
 
 
+
+
+
+
+
 async function replaceImgByInlineSVG(img) {
   const src = img.getAttribute("src");
   if (!src) return;
@@ -149,7 +154,7 @@ async function replaceImgByInlineSVG(img) {
   const linkUrl = parent.getAttribute("href");
   const isActive = pageUrl === linkUrl;
 
-  // apparition initiale aléatoire
+  // --- apparition initiale pour tous ---
   const delay = Math.random() * 800;
   setTimeout(() => {
     parent.classList.add("is-visible");
@@ -161,12 +166,13 @@ async function replaceImgByInlineSVG(img) {
 
     svg.style.opacity = 1;
 
-    // après apparition complète
+    // --- après apparition complète ---
     setTimeout(() => {
       if (!isActive) {
         returnToDefault(svg, dots, parent); // lien actif ne revient pas à 0.5
       }
-      // ✅ plus d'effet hover/click
+      // hover effect uniquement si pas actif
+      if (!isActive) addHoverEffect(svg, parent);
     }, 3000);
   }, delay);
 }
@@ -177,6 +183,23 @@ function returnToDefault(svg, dots, parent) {
   dots.forEach(dot => {
     const dotDelay = Math.random() * 500;
     setTimeout(() => dot.style.opacity = 0.5, dotDelay);
+  });
+}
+
+// hover effect pour les non-actifs
+function addHoverEffect(svg, parent) {
+  const dots = svg.querySelectorAll("path, circle, rect, polygon");
+
+  parent.addEventListener("mouseenter", () => {
+    svg.style.opacity = 1;
+    dots.forEach(dot => {
+      const dotDelay = Math.random() * 300;
+      setTimeout(() => dot.style.opacity = 1, dotDelay);
+    });
+  });
+
+  parent.addEventListener("mouseleave", () => {
+    returnToDefault(svg, dots, parent);
   });
 }
 
@@ -194,6 +217,13 @@ function bubbleTextAnimation() {
 
 
 
+
+
+
+
+// ===============================
+// Animation du cluster avec panels
+// ===============================
 function clusterAnimation() {
   const cluster = document.querySelector('.cluster');
   const panels = Array.from(cluster.querySelectorAll('.panel'));
@@ -204,7 +234,6 @@ function clusterAnimation() {
   // Reconstruire la grille avec cases vides
   const newOrder = [];
   let panelIndex = 0;
-
   for (let i = 0; i < panels.length + emptyPositions.length; i++) {
     if (emptyPositions.includes(i)) {
       const emptyDiv = document.createElement('div');
@@ -219,31 +248,91 @@ function clusterAnimation() {
   cluster.innerHTML = '';
   newOrder.forEach(el => cluster.appendChild(el));
 
-  // ANIMATION ALÉATOIRE DES PANELS
+  // Mélanger l'ordre des panels pour apparition aléatoire
   const finalPanels = Array.from(cluster.querySelectorAll('.panel'));
-
-  // Mélanger l'ordre aléatoirement
   const shuffledPanels = finalPanels
     .map(p => ({ panel: p, sort: Math.random() }))
     .sort((a, b) => a.sort - b.sort)
     .map(obj => obj.panel);
 
-  // Ajouter classes avec délai aléatoire pour chaque panel
-  shuffledPanels.forEach(panel => {
-    const borderDelay = Math.random() * 800; // bordure aléatoire
+  // Animation aléatoire des panels
+  let visibleCount = 0; // compteur pour savoir quand toutes les images sont visibles
 
-    // apparition de la bordure
+  shuffledPanels.forEach(panel => {
+    const borderDelay = Math.random() * 800;
+
     setTimeout(() => {
       panel.classList.add('is-loading');
 
-      // apparition de l'image après bordure
       setTimeout(() => {
         panel.classList.add('is-visible');
-        panel.classList.remove('is-loading'); // enlève la bordure
-      }, 400 + Math.random() * 300); // délai variable image
+        panel.classList.remove('is-loading');
+
+        visibleCount++;
+
+        // 🔹 Condition : activer hover uniquement quand toutes les images sont visibles
+        if (visibleCount === shuffledPanels.length) {
+          addClusterHoverEffect(); // une seule fois pour toutes les images
+        }
+      }, 400 + Math.random() * 300);
     }, borderDelay);
   });
 }
+
+
+
+// ===============================
+// Ajouter l'effet cercle hover sur toutes les images du cluster
+// ===============================
+function addClusterHoverEffect() {
+  const panels = document.querySelectorAll('.cluster .panel img');
+
+  panels.forEach(img => {
+    const panel = img.parentElement;
+
+    // Créer le cercle si pas déjà présent
+    let hoverCircle = document.createElement('div');
+    hoverCircle.classList.add('hover-circle');
+    document.body.appendChild(hoverCircle); // ajouter au body pour ne pas être masqué
+
+    // Style du cercle
+    hoverCircle.style.position = 'absolute';
+    hoverCircle.style.border = '2px solid #dbfaff';
+    hoverCircle.style.borderRadius = '50%';
+    hoverCircle.style.pointerEvents = 'none'; // ne bloque pas le hover
+    hoverCircle.style.opacity = 0;
+    hoverCircle.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+    hoverCircle.style.zIndex = 9999;
+
+    // Fonction pour mettre à jour la position et taille du cercle
+    function updateCircle() {
+      const rect = img.getBoundingClientRect();
+      const size = Math.max(rect.width, rect.height) + 6; // 2px espace
+      hoverCircle.style.width = `${size}px`;
+      hoverCircle.style.height = `${size}px`;
+      hoverCircle.style.top = `${rect.top + window.scrollY + rect.height / 2}px`;
+      hoverCircle.style.left = `${rect.left + window.scrollX + rect.width / 2}px`;
+      hoverCircle.style.transform = 'translate(-50%, -50%)';
+    }
+
+    // Mettre à jour maintenant et à chaque resize/scroll
+    updateCircle();
+    window.addEventListener('resize', updateCircle);
+    window.addEventListener('scroll', updateCircle);
+
+    // Apparition/disparition au hover
+    panel.addEventListener('mouseenter', () => {
+      updateCircle();
+      hoverCircle.style.opacity = 1;
+    });
+
+    panel.addEventListener('mouseleave', () => {
+      hoverCircle.style.opacity = 0;
+    });
+  });
+}
+
+
 
 
 
@@ -374,9 +463,6 @@ function amateurDisappear() {
 }
 
 
-
-
-
 function startAmateurLoop() {
   const texts = [
     "Life through a smartphone lens.",
@@ -405,6 +491,8 @@ function startAmateurLoop() {
 
   loop();
 }
+
+
 
 
 
