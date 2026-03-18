@@ -38,7 +38,7 @@ body {
   padding: 0;
   background: #000f0f;
   font-family: sans-serif;
-  overflow: hidden;
+
 }
 
 
@@ -125,7 +125,6 @@ body {
 /* cacher l'image avant le remplacement */
 .vu .nav-item img.nav-svg {
   display: block;
-  width: 100%;
   height: auto;
   opacity: 0; /* invisible jusqu'à remplacement */
 }
@@ -137,6 +136,8 @@ body {
   display: block;
   opacity: 0;
 }
+
+
 
 /* état visible */
 .vu .nav-item.is-visible {
@@ -154,8 +155,11 @@ body {
 
 
 
-
-
+/* classe minim : réduit la taille à 10% */
+.vu .nav-item svg.minim {
+  transform: scale(0.3);
+  transition: transform 0.6s ease;
+}
 
 
 
@@ -195,8 +199,7 @@ body {
 
 
 .amateur {
-  position: fixed;
-  top: 40%;
+  position: absolute;
   color: #dbfaff;
   font-family: "OffDot", monospace;
   font-size: 1rem;
@@ -205,6 +208,7 @@ body {
   text-align: center;
   letter-spacing: 1px;
   color: transparent;
+  margin-top: 20%;
 }
 
 
@@ -214,21 +218,12 @@ body {
 
 
 
-
-
-
-
-.empty {
-  width: 100%;
-  height: 100%;
-  background: transparent; /* juste vide */
-}
 
 
 
 /* === SCÈNE ET GRILLE === */
 .scene {
-  position: fixed;
+  position: absolute;
   width: 95vw;
   height: 100vh;
   display: grid;
@@ -237,8 +232,7 @@ body {
   gap: 10px;             /* espace entre les images */
   padding: 10px;          /* petit padding autour de la grille */
   box-sizing: border-box;
-  margin-left: 0%;
-  margin-top: 25%;
+  margin-top: 15%;
 
 }
 
@@ -255,13 +249,11 @@ body {
   border-radius: 50%;
   overflow: hidden;
   cursor: pointer;
-}
-
-
-/* --- ANIMATION APPARITION PANELS --- */
-.panel {
   position: relative;
+
 }
+
+
 
 /* image cachée au début */
 .panel img {
@@ -304,6 +296,24 @@ body {
 .panel.is-visible::before {
   opacity: 0;
 }
+
+
+/* classe maxim : agrandit */
+.panel.maxim {
+  transform: scale(5); /* ajuste si tu veux plus/moins */
+  transition: transform 0.6s ease;
+}
+
+/* === SCÈNE ET GRILLE === */
+.scene.maxim {
+  position: absolute;
+  width: 28vw;
+  transform: scale(1); /* ajuste si tu veux plus/moins */
+  transition: transform 0.6s ease;
+}
+
+
+
 
 /* animation rotation unique */
 @keyframes spinBorderOnce {

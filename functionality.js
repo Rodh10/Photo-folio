@@ -1,5 +1,5 @@
 // ===============================
-// Animation cinématique du loading avec apparition/disparition aléatoire
+// SECTIO LOADER
 // ===============================
 function launchLoadingSVGAnimation(svg, loader, onFinish) {
   const pieces = [...svg.querySelectorAll("path, circle, rect, polygon, line, polyline, ellipse")];
@@ -53,10 +53,6 @@ function launchLoadingSVGAnimation(svg, loader, onFinish) {
   }, maxAppearDelay + 1800 + 1500); // marge finale pour s'assurer que tout est fini
 }
 
-
-// ===============================
-// Fonction startLoader avec callback
-// ===============================
 function startLoader() {
   return new Promise((resolve) => {
     const alreadyPlayed = sessionStorage.getItem("loadingSVGPlayed");
@@ -80,9 +76,6 @@ function startLoader() {
   });
 }
 
-// ===============================
-// Modification inlineLoadingSVG pour accepter callback
-// ===============================
 async function inlineLoadingSVG(loader, onFinish) {
   if (!loader) return;
 
@@ -120,8 +113,9 @@ async function inlineLoadingSVG(loader, onFinish) {
 
 
 
-
-
+// ===============================
+// SECTION MENU
+// ===============================
 
 
 async function replaceImgByInlineSVG(img) {
@@ -209,6 +203,41 @@ function bubbleTextAnimation() {
 }
 
 
+// ===============================
+// nouvelle fonction : shrink / minim
+// ===============================
+
+function applyMinim(svg) {
+  if (!svg) return;
+  svg.classList.add("minim"); // applique la classe CSS
+}
+
+// fonction pour retirer le minim
+function removeMinim(svg) {
+  if (!svg) return;
+  svg.classList.remove("minim");
+}
+
+// exemple d'utilisation : tous les SVG de navigation
+function shrinkAllNavSVG() {
+  document.querySelectorAll(".vu .nav-item svg").forEach(svg => {
+    applyMinim(svg);
+  });
+}
+
+function resetAllNavSVG() {
+  document.querySelectorAll(".vu .nav-item svg").forEach(svg => {
+    removeMinim(svg);
+  });
+}
+
+
+
+
+
+
+
+
 
 
 
@@ -222,8 +251,138 @@ function bubbleTextAnimation() {
 
 
 // ===============================
-// Animation du cluster avec panels
+// SECTION ANIMATION TEXTE
 // ===============================
+
+
+let amateurLoopActive = true; // contrôle la boucle
+let amateurTimeouts = [];     // stocke tous les timeouts actifs
+
+// --- Crée les spans du texte
+function splitAmateurText(text) {
+  const p = document.querySelector(".amateur p");
+  if (!p) return null;
+
+  p.innerHTML = "";
+  [...text].forEach(char => {
+    const span = document.createElement("span");
+    span.textContent = char === " " ? "\u00A0" : char;
+    span.style.display = "inline-block";
+    span.style.opacity = "0";
+    p.appendChild(span);
+  });
+  return p;
+}
+
+// --- Apparition aléatoire
+function amateurAppear(text) {
+  const p = splitAmateurText(text);
+  if (!p) return;
+
+  p.style.color = "#dbfaff";
+  const spans = [...p.querySelectorAll("span")];
+
+  spans.forEach(span => {
+    const delay = Math.random() * 900;
+    const t = setTimeout(() => {
+      span.style.transition = "opacity 0.25s ease";
+      span.style.opacity = "1";
+    }, delay);
+    amateurTimeouts.push(t);
+  });
+}
+
+// --- Disparition aléatoire de boucle (ne stoppe pas la loop)
+function amateurDisappearLoop() {
+  const p = document.querySelector(".amateur p");
+  if (!p) return;
+  const spans = [...p.querySelectorAll("span")];
+  spans.forEach(span => {
+    const delay = Math.random() * 700;
+    const t = setTimeout(() => {
+      span.style.transition = "opacity 0.25s ease";
+      span.style.opacity = "0";
+    }, delay);
+    amateurTimeouts.push(t);
+  });
+  // Remet la couleur transparente après disparition
+  const t = setTimeout(() => { if(p) p.style.color = "transparent"; }, 900);
+  amateurTimeouts.push(t);
+}
+
+// --- Boucle principale
+function startAmateurLoop() {
+  const texts = [
+    "Life through a smartphone lens.",
+    "Feeling like a déjà-vu",
+    "Logic ends where paradox begins."
+  ];
+  let index = 0;
+
+  function loop() {
+    if (!amateurLoopActive) return; // stop si on veut terminer
+    amateurAppear(texts[index]);
+
+    const t1 = setTimeout(() => {
+      amateurDisappearLoop();
+      const t2 = setTimeout(() => {
+        index = (index + 1) % texts.length;
+        loop();
+      }, 1200);
+      amateurTimeouts.push(t2);
+    }, 10000);
+    amateurTimeouts.push(t1);
+  }
+
+  loop();
+}
+
+
+function hideAmateurTextInstant() {
+  const p = document.querySelector(".amateur p");
+  if (!p) return;
+
+  const spans = [...p.querySelectorAll("span")];
+
+  spans.forEach(span => {
+    span.style.transition = "none"; // pas d'animation
+    span.style.opacity = "0";
+  });
+
+  p.style.color = "transparent";
+}
+
+let hasScrolled = false;
+
+function handleScrollAmateur() {
+  if (hasScrolled) return; // évite spam
+  hasScrolled = true;
+
+  hideAmateurTextInstant();
+
+  // optionnel : stop complètement la loop
+  amateurLoopActive = false;
+
+  // clear tous les timeouts actifs
+  amateurTimeouts.forEach(t => clearTimeout(t));
+  amateurTimeouts = [];
+}
+
+
+
+
+
+
+
+
+
+
+
+
+// ===============================
+// SECTION IMAGES
+// ===============================
+
 function clusterAnimation() {
   const cluster = document.querySelector('.cluster');
   const panels = Array.from(cluster.querySelectorAll('.panel'));
@@ -279,11 +438,6 @@ function clusterAnimation() {
   });
 }
 
-
-
-// ===============================
-// Ajouter l'effet cercle hover sur toutes les images du cluster
-// ===============================
 function addClusterHoverEffect() {
   const panels = document.querySelectorAll('.cluster .panel img');
 
@@ -332,164 +486,41 @@ function addClusterHoverEffect() {
   });
 }
 
+function enableMaximOnScroll() {
+  let activated = false;
 
+  function handleScroll() {
+    if (activated) return;
 
+    const scene = document.querySelector('.scene');
+    if (!scene) return;
 
+    activated = true;
 
+    const allPanels = scene.querySelectorAll('.panel');
 
+    // Indices des panels à garder visibles
+    const indicesToMaxim = [0, 3, 5, 7]; 
 
+    allPanels.forEach((panel, i) => {
+      if (indicesToMaxim.includes(i)) {
+        // Garder et agrandir
+        panel.classList.add('maxim');
+        panel.style.zIndex = 2;
+        panel.style.opacity = 1;
+      } else {
+        // Faire disparaître complètement
+        panel.style.opacity = 0;
+        panel.style.pointerEvents = 'none'; // si tu veux bloquer le hover
+        // ou si tu préfères : panel.style.display = 'none';
+      }
+    });
 
-/*
-
-function makeQuarterCircleRoundedBottomLeft(paraSelector) {
-  const paragraphs = document.querySelectorAll(paraSelector);
-
-  paragraphs.forEach((p, index) => {
-    const text = p.textContent.trim();
-    const fontSize = parseFloat(getComputedStyle(p).fontSize);
-    const charWidth = fontSize * 0.6;
-
-    const width = p.clientWidth;
-    const radius = width * 0.87;
-    let i = 0;
-    const lines = [];
-
-    let lineIndex = 0;
-    while (i < text.length) {
-        const y = lineIndex * fontSize;
-        if (y > radius) break;
-
-        // largeur max selon le quart de cercle
-        let maxLineWidth = Math.sqrt(radius * radius - y * y);
-
-        // deuxième paragraphe : quart bas-gauche
-        if (index === 1) {
-            const remainingChars = text.length - i;
-            const charsInLine = Math.min(Math.floor(maxLineWidth / charWidth) || 1, remainingChars);
-            const lineText = text.substr(i, charsInLine); // texte normal, pas inversé
-            lines.push(lineText); 
-            i += charsInLine;
-        } else {
-            const charsInLine = Math.floor(maxLineWidth / charWidth) || 1;
-            lines.push(text.substr(i, charsInLine));
-            i += charsInLine;
-        }
-
-        lineIndex++;
-    }
-
-    // reste du texte
-    if (i < text.length) {
-      const remaining = text.substr(i);
-      if (index === 1) lines.unshift(remaining);
-      else lines.push(remaining);
-    }
-
-    // remplacement par spans avec alignement
-    p.innerHTML = lines.map(line => `<span style="display:block; text-align:${index === 1 ? 'right' : 'left'}">${line}</span>`).join('');
-  });
-}
-
-
-window.addEventListener('load', () => {
-  makeQuarterCircleRoundedBottomLeft('.para p');
-});
-
-*/
-
-
-
-
-
-
-
-function splitAmateurText(text) {
-  const p = document.querySelector(".amateur p");
-  if (!p) return null;
-
-  // Remplacer le contenu par le nouveau texte
-  p.innerHTML = "";
-
-  [...text].forEach(char => {
-    const span = document.createElement("span");
-    span.textContent = char === " " ? "\u00A0" : char;
-    span.style.display = "inline-block";
-    span.style.opacity = "0";
-    p.appendChild(span);
-  });
-
-  return p;
-}
-
-// ✅ Apparition aléatoire
-function amateurAppear(text) {
-  const p = splitAmateurText(text);
-  if (!p) return;
-
-  p.style.color = "#dbfaff";
-
-  const spans = [...p.querySelectorAll("span")];
-
-  spans.forEach(span => {
-    const delay = Math.random() * 900;
-
-    setTimeout(() => {
-      span.style.transition = "opacity 0.25s ease";
-      span.style.opacity = "1";
-    }, delay);
-  });
-}
-
-// ✅ Disparition aléatoire
-function amateurDisappear() {
-  const p = document.querySelector(".amateur p");
-  if (!p) return;
-
-  const spans = [...p.querySelectorAll("span")];
-  if (!spans.length) return;
-
-  spans.forEach(span => {
-    const delay = Math.random() * 700;
-
-    setTimeout(() => {
-      span.style.transition = "opacity 0.25s ease";
-      span.style.opacity = "0";
-    }, delay);
-  });
-
-  setTimeout(() => {
-    p.style.color = "transparent";
-  }, 900);
-}
-
-
-function startAmateurLoop() {
-  const texts = [
-    "Life through a smartphone lens.",
-    "Feeling like a déjà-vu",
-    "Logic ends where paradox begins."
-  ];
-
-  let index = 0;
-
-  function loop() {
-    // 1) apparition
-    amateurAppear(texts[index]);
-
-    // 2) attendre un peu, puis disparition
-    setTimeout(() => {
-      amateurDisappear();
-
-      // 3) attendre la fin de disparition, puis changer texte
-      setTimeout(() => {
-        index = (index + 1) % texts.length;
-        loop();
-      }, 1200);
-
-    }, 10000); // durée où le texte reste visible
+    // On peut aussi appliquer la classe sur le conteneur si tu veux
+    scene.classList.add('maxim');
   }
 
-  loop();
+  window.addEventListener('scroll', handleScroll);
 }
 
 
@@ -500,6 +531,14 @@ function startAmateurLoop() {
 
 
 
+
+
+
+
+
+// ===============================
+// SECTION REGROUPEMENT ANIMATIONS
+// ===============================
 
 function launchAnimations() {
   // Étape 1 : disparition des cercles
@@ -519,11 +558,8 @@ function launchAnimations() {
 
 
 
-
-
-
 // ===============================
-// Au chargement de la page
+// CHARGEMENT DE LA PAGE
 // ===============================
 window.addEventListener("load", () => {
   document.fonts.ready.then(() => {
@@ -535,3 +571,47 @@ window.addEventListener("load", () => {
 });
 
 
+
+
+
+
+
+
+// ===============================
+// SECTION SCROLL & REDIRECTION
+// ===============================
+
+
+let scrollCooldown = false;
+let startY = 0;
+
+function handleScrollToRoam() {
+  if (scrollCooldown) return;
+  scrollCooldown = true;
+
+  // Réduire tous les SVG à 10%
+  shrinkAllNavSVG();
+  handleScrollAmateur();
+  enableMaximOnScroll();
+
+}
+
+// === Desktop ===
+window.addEventListener('wheel', e => {
+  if (e.deltaY <= 0) return; // ignore scroll vers le haut
+  handleScrollToRoam();
+});
+
+// === Mobile ===
+window.addEventListener('touchstart', e => {
+  startY = e.touches[0].clientY; // position de départ du doigt
+});
+
+window.addEventListener('touchend', e => {
+  const endY = e.changedTouches[0].clientY;
+  const diff = startY - endY;
+
+  if (diff > 50) { // swipe vers le haut → scroll vers le bas
+    handleScrollToRoam();
+  }
+});
