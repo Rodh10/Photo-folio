@@ -298,19 +298,6 @@ body {
 }
 
 
-/* classe maxim : agrandit */
-.panel.maxim {
-  transform: scale(5); /* ajuste si tu veux plus/moins */
-  transition: transform 0.6s ease;
-}
-
-/* === SCÈNE ET GRILLE === */
-.scene.maxim {
-  position: absolute;
-  width: 28vw;
-  transform: scale(1); /* ajuste si tu veux plus/moins */
-  transition: transform 0.6s ease;
-}
 
 
 

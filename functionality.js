@@ -203,6 +203,10 @@ function bubbleTextAnimation() {
 }
 
 
+
+
+
+
 // ===============================
 // nouvelle fonction : shrink / minim
 // ===============================
@@ -230,11 +234,6 @@ function resetAllNavSVG() {
     removeMinim(svg);
   });
 }
-
-
-
-
-
 
 
 
@@ -486,51 +485,71 @@ function addClusterHoverEffect() {
   });
 }
 
-function enableMaximOnScroll() {
-  let activated = false;
+// ===============================
+// CASCADE VERTICALE LIMITÉE FIXE À 4 COLONNES
+// ===============================
 
-  function handleScroll() {
-    if (activated) return;
+function initVerticalCascadeScroll() {
+  // Récupérer toutes les images (panels) et le conteneur principal
+  const panels = Array.from(document.querySelectorAll('.panel'));
+  const scene = document.querySelector('.scene');
 
-    const scene = document.querySelector('.scene');
-    if (!scene) return;
+  // Définir le nouveau layout : 4 colonnes avec un gap fixe
+  const columns = 4;            // nombre de colonnes dans le nouveau rang
+  const panelGap = 10;          // correspond au gap CSS entre les images
+  const panelWidth = 100; // largeur d'une image
+  const panelHeight = panelWidth; // carré pour garder les images proportionnelles
 
-    activated = true;
+  // Trier les images du bas vers le haut pour la cascade
+  const orderedPanels = [...panels].sort((a, b) => {
+    const rectA = a.getBoundingClientRect();
+    const rectB = b.getBoundingClientRect();
+    return rectB.top - rectA.top; // les plus basses en premier
+  });
 
-    const allPanels = scene.querySelectorAll('.panel');
+  // Calculer la position finale de chaque image dans la grille de 4 colonnes
+  const finalPositions = orderedPanels.map((panel, index) => {
+    const col = index % columns;           // colonne de 0 à 3
+    const row = Math.floor(index / columns); // ligne calculée dynamiquement
+    return { panel, col, row };            // stocker les informations
+  });
 
-    // Indices des panels à garder visibles
-    const indicesToMaxim = [0, 3, 5, 7]; 
+  // Fonction qui anime les images au scroll
+  function animatePanelsOnScroll() {
+    const scrollY = window.scrollY;
+    const progress = Math.min(scrollY / 500, 1); // facteur 0 → 1 pour limiter la descente
 
-    allPanels.forEach((panel, i) => {
-      if (indicesToMaxim.includes(i)) {
-        // Garder et agrandir
-        panel.classList.add('maxim');
-        panel.style.zIndex = 2;
-        panel.style.opacity = 1;
-      } else {
-        // Faire disparaître complètement
-        panel.style.opacity = 0;
-        panel.style.pointerEvents = 'none'; // si tu veux bloquer le hover
-        // ou si tu préfères : panel.style.display = 'none';
-      }
+    // Parcourir toutes les images et appliquer leur transformation
+    finalPositions.forEach(({ panel, col, row }, index) => {
+      const delay = index * 50; // créer un effet cascade progressive du bas vers le haut
+
+      // Appliquer le déplacement après un petit délai
+      setTimeout(() => {
+        const x = col * (panelWidth + panelGap); // position horizontale dans la colonne
+        const y = row * (panelHeight + panelGap); // position verticale selon la ligne
+        const scale = 1; // pas de changement de taille (tu peux modifier si nécessaire)
+
+        // Transition fluide pour le déplacement
+        panel.style.transition = 'transform 1.5s ease';
+        panel.style.transform = `translate(${x}px, ${y}px) scale(${scale})`;
+      }, delay * progress); // multiplier par progress pour que le scroll contrôle la cascade
     });
-
-    // On peut aussi appliquer la classe sur le conteneur si tu veux
-    scene.classList.add('maxim');
   }
 
-  window.addEventListener('scroll', handleScroll);
+  // Déclencher l'animation à chaque scroll
+  window.addEventListener('scroll', animatePanelsOnScroll);
+
+  // Réinitialiser les positions si la fenêtre est redimensionnée
+  window.addEventListener('resize', () => {
+    // recalculer la largeur d'une image si nécessaire
+    const newPanelWidth = Math.floor(scene.clientWidth / columns) - panelGap;
+
+    // Remettre toutes les images à leur position initiale
+    panels.forEach(panel => {
+      panel.style.transform = 'translate(0,0) scale(1)';
+    });
+  });
 }
-
-
-
-
-
-
-
-
-
 
 
 
@@ -592,7 +611,9 @@ function handleScrollToRoam() {
   // Réduire tous les SVG à 10%
   shrinkAllNavSVG();
   handleScrollAmateur();
-  enableMaximOnScroll();
+  initVerticalCascadeScroll();
+
+
 
 }
 
